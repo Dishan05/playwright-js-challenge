@@ -4,11 +4,35 @@
     "locked": { "username": "locked_out_user", "password": "secret_sauce" }
   },
   "invalidUsers": {
-    "blankCredentials": { "username": "", "password": "" },
-    "blankUsername": { "username": "", "password": "secret_sauce" },
-    "blankPassword": { "username": "standard_user", "password": "" },
-    "wrongUsername": { "username": "wrong_user", "password": "secret_sauce" },
-    "wrongPassword": { "username": "standard_user", "password": "wrong_password" },
-    "wrongCredentials": { "username": "wrong_user", "password": "wrong_password" }
+    "blankCredentials": {
+      "username": "",
+      "password": "",
+      "error": "Epic sadface: Username is required"
+    },
+    "blankUsername": {
+      "username": "",
+      "password": "secret_sauce",
+      "error": "Epic sadface: Username is required"
+    },
+    "blankPassword": {
+      "username": "standard_user",
+      "password": "",
+      "error": "Epic sadface: Password is required"
+    },
+    "wrongUsername": {
+      "username": "wrong_user",
+      "password": "secret_sauce",
+      "error": "Epic sadface: Username and password do not match any user in this service"
+    },
+    "wrongPassword": {
+      "username": "standard_user",
+      "password": "wrong_password",
+      "error": "Epic sadface: Username and password do not match any user in this service"
+    },
+    "wrongCredentials": {
+      "username": "wrong_user",
+      "password": "wrong_password",
+      "error": "Epic sadface: Username and password do not match any user in this service"
+    }
   }
 }
