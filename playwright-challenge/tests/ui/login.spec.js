@@ -12,13 +12,13 @@ const errorIcon = ".error_icon";
 test.describe("Functional Login Tests", () => {
   test("should login with standard user", async ({ page }) => {
     await page.goto(loginPage);
-    await login(page, testData.validUsers.standard.username, testData.validUsers.standard.password);
+    await login(page, testData.validUsers.standard_user.username, testData.validUsers.standard_user.password);
     await expect(page).toHaveURL(inventoryPage);
   });
 
   test("should not login with locked user", async ({ page }) => {
     await page.goto(loginPage);
-    await login(page, testData.validUsers.locked.username, testData.validUsers.locked.password);
+    await login(page, testData.validUsers.locked_out_user.username, testData.validUsers.locked_out_user.password);
     await expect(page.locator(errorMessage)).toContainText(
       "Epic sadface: Sorry, this user has been locked out."
     );
@@ -29,7 +29,7 @@ test.describe("Functional Login Tests", () => {
     page,
   }) => {
     await page.goto(loginPage);
-    await login(page, testData.validUsers.locked.username, testData.validUsers.locked.password);
+    await login(page, testData.validUsers.locked_out_user.username, testData.validUsers.locked_out_user.password);
 
     const error = page.locator(errorMessage);
     await expect(error).toBeVisible();
@@ -83,7 +83,7 @@ test.describe("Edge Case Login Form Tests", () => {
 
 test('should fail login if username is in uppercase', async ({ page }) => {
   await page.goto(loginPage);
-  await login(page, testData.validUsers.standard.username.toUpperCase(), testData.validUsers.standard.password);
+  await login(page, testData.validUsers.standard_user.username.toUpperCase(), testData.validUsers.standard_user.password);
   await expect(page.locator(errorMessage)).toBeVisible();
   await expect(page).not.toHaveURL(inventoryPage);
 });
@@ -113,9 +113,9 @@ test('should show consistent errors after multiple failed logins', async ({ page
   test('should allow login via keyboard-only navigation', async ({ page }) => {
   await page.goto(loginPage);
   await page.keyboard.press('Tab');
-  await page.keyboard.type(testData.validUsers.standard.username);
+  await page.keyboard.type(testData.validUsers.standard_user.username);
   await page.keyboard.press('Tab');
-  await page.keyboard.type(testData.validUsers.standard.password);
+  await page.keyboard.type(testData.validUsers.standard_user.password);
   await page.keyboard.press('Enter');
 
   await expect(page).toHaveURL(inventoryPage);
