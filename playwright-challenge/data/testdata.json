@@ -43,5 +43,73 @@
       "password": "wrong_password",
       "error": "Epic sadface: Username and password do not match any user in this service"
     }
+  },
+  "checkoutInformation": {
+    "valid": {
+      "firstName": "John",
+      "lastName": "Doe",
+      "zip": "12345",
+      "shouldSucceed": true
+    },
+    "missingFirstName": {
+      "firstName": "",
+      "lastName": "Doe",
+      "zip": "12345",
+      "expectedError": "Error: First Name is required"
+    },
+    "missingLastName": {
+      "firstName": "John",
+      "lastName": "",
+      "zip": "12345",
+      "expectedError": "Error: Last Name is required"
+    },
+    "missingZip": {
+      "firstName": "John",
+      "lastName": "Doe",
+      "zip": "",
+      "expectedError": "Error: Postal Code is required"
+    },
+    "allFieldsEmpty": {
+      "firstName": "",
+      "lastName": "",
+      "zip": "",
+      "expectedError": "Error: First Name is required"
+    },
+    "whitespaceFirstName": {
+      "firstName": " ",
+      "lastName": "Doe",
+      "zip": "12345",
+      "expectedError": "Error: First Name is required"
+    },
+    "whitespaceLastName": {
+      "firstName": "John",
+      "lastName": " ",
+      "zip": "12345",
+      "expectedError": "Error: Last Name is required"
+    },
+    "whitespaceZip": {
+      "firstName": "John",
+      "lastName": "Doe",
+      "zip": " ",
+      "expectedError": "Error: Postal Code is required"
+    },
+    "specialCharsLastName": {
+      "firstName": "John",
+      "lastName": "!@#$%^",
+      "zip": "12345",
+      "shouldSucceed": true
+    },
+    "nonNumericZip": {
+      "firstName": "John",
+      "lastName": "Doe",
+      "zip": "ABCDE",
+      "shouldSucceed": true
+    },
+    "mixedZip": {
+      "firstName": "John",
+      "lastName": "Doe",
+      "zip": "123AB",
+      "shouldSucceed": true
+    }
   }
 }

@@ -35,6 +35,8 @@ for (const userType of [
       await expect(page).toHaveURL(INVENTORY_PAGE);
     });
 
+    //Add test to check what happens when the back/continue shopping button is clicked
+
     test("adds item from inventory and appears in cart", async ({ page }) => {
       const firstItem = page.locator(SELECTORS.inventoryItems).nth(0);
       const name = await firstItem.locator(SELECTORS.itemName).textContent();
