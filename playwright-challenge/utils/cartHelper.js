@@ -6,8 +6,9 @@ const SELECTORS = {
   removeButton: 'button:has-text("Remove")',
   inventoryPage: "/inventory.html",
   inventoryItems: ".inventory_item",
-  addToCartBtn: 'button:has-text("Add to cart")',
-  checkoutBtn: '[data-test="checkout"]',
+  addToCartButton: 'button:has-text("Add to cart")',
+  removeFromCartButton: 'button:has-text("Remove")',
+  checkoutButton: '[data-test="checkout"]',
   continueShoppingButton: '[data-test="continue-shopping"]',
 };
 
@@ -37,7 +38,7 @@ async function addFirstItemToCart(page) {
 
   // Add first item to cart
   const firstItem = page.locator(SELECTORS.inventoryItems).nth(0);
-  await firstItem.locator(SELECTORS.addToCartBtn).click();
+  await firstItem.locator(SELECTORS.addToCartButton).click();
 }
 
 async function addItemToCart(page, itemIndex) {
@@ -46,7 +47,33 @@ async function addItemToCart(page, itemIndex) {
 
   // Add item to cart
   const item = page.locator(SELECTORS.inventoryItems).nth(itemIndex);
-  await item.locator(SELECTORS.addToCartBtn).click();
+  await item.locator(SELECTORS.addToCartButton).click();
+}
+
+async function addAllItemsToCart(page) {
+  // Ensure you're on the inventory page
+  await expect(page).toHaveURL(SELECTORS.inventoryPage);
+
+  // Add all items to cart
+  const items = page.locator(SELECTORS.inventoryItems);
+  const count = await items.count();
+  for (let i = 0; i < count; i++) {
+    const item = items.nth(i);
+    await item.locator(SELECTORS.addToCartButton).click();
+  }
+}
+
+async function removeAllItemsFromCart(page) {
+  // Ensure you're on the inventory page
+  await expect(page).toHaveURL(SELECTORS.inventoryPage);
+
+  // Remove all items from cart
+  const items = page.locator(SELECTORS.inventoryItems);
+  const count = await items.count();
+  for (let i = 0; i < count; i++) {
+    const item = items.nth(i);
+    await item.locator(SELECTORS.removeFromCartButton).click();
+  }
 }
 
 async function goToCart(page) {
@@ -57,7 +84,7 @@ async function goToCart(page) {
 
 async function proceedToCheckout(page) {
   // Click on the checkout button, and ensure that you're redirected to the checkout step one page
-  await page.click(SELECTORS.checkoutBtn);
+  await page.click(SELECTORS.checkoutButton);
   await expect(page).toHaveURL(CHECKOUT_STEP_ONE);
 }
 
@@ -71,6 +98,8 @@ module.exports = {
   clearCart,
   addFirstItemToCart,
   addItemToCart,
+  addAllItemsToCart,
+  removeAllItemsFromCart,
   goToCart,
   continueShopping,
   proceedToCheckout

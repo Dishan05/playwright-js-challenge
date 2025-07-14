@@ -111,5 +111,25 @@
       "zip": "123AB",
       "shouldSucceed": true
     }
+  },
+  "inventoryItems":
+  {
+    "expectedImageSrcs":
+    [
+      "sauce-backpack",
+        "bike-light",
+        "bolt-shirt",
+        "sauce-pullover",
+        "red-onesie",
+        "red-tatt"
+    ],
+    "expectedNumberofInventoryItems": 6,
+    "sortOptions":
+    {
+      "alphabetical": "az",
+      "reverseAlphabetical": "za",
+      "priceLowToHigh": "lohi",
+      "priceHighToLow": "hilo"
+    }
   }
 }

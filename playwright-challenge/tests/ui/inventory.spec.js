@@ -1,14 +1,30 @@
 const { test, expect } = require("@playwright/test");
 const testData = require("../../data/testData.json");
 const { login } = require("../../utils/loginHelper.js");
-const { clearCart } = require("../../utils/cartHelper.js");
+const {
+  clearCart,
+  addAllItemsToCart,
+  removeAllItemsFromCart,
+  addFirstItemToCart,
+  goToCart,
+} = require("../../utils/cartHelper.js");
+const {
+  getInventoryItemNameAtIndex,
+  clickInventoryItem,
+  selectSortOption,
+  getItemNames,
+  getItemPrices,
+} = require("../../utils/inventoryHelper.js");
 
-const loginPage = "/";
+const LOGIN_PAGE = "/";
+
+const IMAGE_ATTRIBUTE = "src";
 
 const SELECTORS = {
   inventoryItems: ".inventory_item",
   itemImage: ".inventory_item_img img",
   itemName: ".inventory_item_name",
+  inventoryDetailsName: ".inventory_details_name",
   itemPrice: ".inventory_item_price",
   addToCartBtn: "button.btn_inventory",
   cartBadge: ".shopping_cart_badge",
@@ -27,16 +43,20 @@ for (const userType of [
   test.describe(`${userType} inventory tests`, () => {
     test.beforeEach(async ({ page }) => {
       const user = testData.validUsers[userType];
-      await page.goto(loginPage);
+      await page.goto(LOGIN_PAGE);
       await login(page, user.username, user.password);
       await clearCart(page);
     });
 
-    test(`(${userType}) loads all 6 inventory items with visible core elements`, async ({
+    test(`(Given ${userType} logs in, when they navigate to the inventory page, they should see all 6 items)`, async ({
       page,
     }) => {
       const items = page.locator(SELECTORS.inventoryItems);
-      await expect(items).toHaveCount(6);
+
+      // Assert that there are 6 items on the inventory page
+      await expect(items).toHaveCount(
+        testData.inventoryItems.expectedNumberofInventoryItems
+      );
 
       for (let i = 0; i < (await items.count()); i++) {
         const item = items.nth(i);
@@ -44,8 +64,13 @@ for (const userType of [
 
         await expect(image).toBeVisible();
 
-        const src = await image.getAttribute("src");
-        expect(src).not.toContain("sl-404");
+        const src = await image.getAttribute(IMAGE_ATTRIBUTE);
+        const matchFound = testData.inventoryItems.expectedImageSrcs.some(
+          (expected) => src.toLowerCase().includes(expected.toLowerCase())
+        );
+
+        // Assert that the image source matches one of the expected sources
+        expect(matchFound).toBeTruthy();
 
         await expect(item.locator(SELECTORS.itemName)).toBeVisible();
         await expect(item.locator(SELECTORS.itemPrice)).toBeVisible();
@@ -53,23 +78,21 @@ for (const userType of [
       }
     });
 
-    test(`(${userType}) add all items to cart and verify badge updates, then remove all`, async ({
+    test(`(Given ${userType} logs in, when they add all items to cart, and then remove all items, they should see the cart badge update correctly)`, async ({
       page,
     }) => {
-      const addButtons = page.locator(SELECTORS.addToCartBtn);
-      for (let i = 0; i < 6; i++) {
-        await addButtons.nth(i).click();
-      }
       const badge = page.locator(SELECTORS.cartBadge);
-      await expect(badge).toHaveText("6");
 
-      for (let i = 0; i < 6; i++) {
-        await addButtons.nth(i).click();
-      }
+      await addAllItemsToCart(page);
+      await expect(badge).toHaveText(
+        testData.inventoryItems.expectedNumberofInventoryItems.toString()
+      );
+
+      await removeAllItemsFromCart(page);
       await expect(badge).toBeHidden();
     });
 
-    test("each product navigates to detail page with matching name", async ({
+    test(`(Given ${userType} logs in, when they click on each product, then they should be navigated to the detail page with the correct item information)`, async ({
       page,
     }) => {
       const items = page.locator(SELECTORS.inventoryItems);
@@ -77,64 +100,58 @@ for (const userType of [
 
       for (let i = 0; i < count; i++) {
         const item = items.nth(i);
-        const nameLocator = item.locator(SELECTORS.itemName);
-        const name = (await nameLocator.textContent()).trim();
+        const expectedName = await getInventoryItemNameAtIndex(page, i);
 
-        const linkLocator = await item.locator("a").first();
-        if ((await linkLocator.count()) > 0) {
-          await linkLocator.click();
-        } else {
-          await nameLocator.click();
-        }
+        await clickInventoryItem(item);
         await expect(page).toHaveURL(/\/inventory-item\.html\?id=\d+/);
 
         const detailName = (
-          await page.locator(".inventory_details_name").textContent()
+          await page.locator(SELECTORS.inventoryDetailsName).textContent()
         ).trim();
-        expect(detailName).toBe(name);
+        expect(detailName).toBe(expectedName);
 
         await page.goBack();
         await expect(page.locator(SELECTORS.inventoryItems)).toHaveCount(count);
       }
     });
 
-    test("sort dropdown functions correctly", async ({ page }) => {
-      const getItemNames = async () =>
-        (await page.locator(SELECTORS.itemName).allTextContents()).map((name) =>
-          name.trim()
-        );
-
-      const getItemPrices = async () =>
-        (await page.locator(SELECTORS.itemPrice).allTextContents()).map(
-          (price) => parseFloat(price.replace("$", ""))
-        );
-
-      await page.selectOption(SELECTORS.sortDropdown, "az");
-      let names = await getItemNames();
+    test(`(Given ${userType} logs in, when they sort the items by a specific filter, then the items should be sorted correctly)`, async ({ page }) => {
+      await selectSortOption(
+        page,
+        testData.inventoryItems.sortOptions.alphabetical
+      );
+      let names = await getItemNames(page);
       expect(names).toEqual([...names].sort());
 
-      await page.selectOption(SELECTORS.sortDropdown, "za");
-      names = await getItemNames();
+      await selectSortOption(
+        page,
+        testData.inventoryItems.sortOptions.reverseAlphabetical
+      );
+      names = await getItemNames(page);
       expect(names).toEqual([...names].sort().reverse());
 
-      await page.selectOption(SELECTORS.sortDropdown, "lohi");
-      let prices = await getItemPrices();
+      await selectSortOption(
+        page,
+        testData.inventoryItems.sortOptions.priceLowToHigh
+      );
+      let prices = await getItemPrices(page);
       expect(prices).toEqual([...prices].sort((a, b) => a - b));
 
-      await page.selectOption(SELECTORS.sortDropdown, "hilo");
-      prices = await getItemPrices();
+      await selectSortOption(
+        page,
+        testData.inventoryItems.sortOptions.priceHighToLow
+      );
+      prices = await getItemPrices(page);
       expect(prices).toEqual([...prices].sort((a, b) => b - a));
     });
 
-    test("cart badge persists after navigation and refresh", async ({
+    test(`(Given ${userType} adds an item to the cart, when they go back, or refresh, then the cart badge should remain accurate)`, async ({
       page,
     }) => {
-      //Add an item to the cart
-      await page.locator(SELECTORS.addToCartBtn).first().click();
+      await addFirstItemToCart(page);
       await expect(page.locator(SELECTORS.cartBadge)).toHaveText("1");
 
-      await page.locator(SELECTORS.cartLink).click();
-      await expect(page).toHaveURL(/cart/);
+      await goToCart(page);
 
       await page.goBack();
       await expect(page.locator(SELECTORS.cartBadge)).toHaveText("1");
