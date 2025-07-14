@@ -10,32 +10,28 @@ const errorButton = ".error-button";
 const errorIcon = ".error_icon";
 
 test.describe("Functional Login Tests", () => {
-  test("should login with standard user", async ({ page }) => {
+  test("Given standard user credentials, when user logs in, user is redirected to inventory page", async ({ page }) => {
     await page.goto(loginPage);
     await login(page, testData.validUsers.standard_user.username, testData.validUsers.standard_user.password);
+    
+    // Assert that the user is redirected to the inventory page
     await expect(page).toHaveURL(inventoryPage);
   });
 
-  test("should not login with locked user", async ({ page }) => {
-    await page.goto(loginPage);
-    await login(page, testData.validUsers.locked_out_user.username, testData.validUsers.locked_out_user.password);
-    await expect(page.locator(errorMessage)).toContainText(
-      "Epic sadface: Sorry, this user has been locked out."
-    );
-    await expect(page).not.toHaveURL(inventoryPage);
-  });
-
-  test("should allow error message to be dismissed for locked out user", async ({
+  test("Given locked user credentials, after logging in, user sees and can dismiss error message", async ({
     page,
   }) => {
     await page.goto(loginPage);
-    await login(page, testData.validUsers.locked_out_user.username, testData.validUsers.locked_out_user.password);
+    await login(page, testData.lockedUsers.locked_out_user.username, testData.lockedUsers.locked_out_user.password);
 
+    // Assert that the error message is correctly displayed, and the user is not redirected to the inventory page
     const error = page.locator(errorMessage);
+    await expect(page.locator(errorMessage)).toContainText(testData.lockedUsers.locked_out_user.error);
     await expect(error).toBeVisible();
+    await expect(page).not.toHaveURL(inventoryPage);
 
+    // Assert that the error button is clickable, and dismissed the error
     await page.click(errorButton);
-
     await expect(error).not.toBeVisible();
   });
 
@@ -48,13 +44,15 @@ test.describe("Functional Login Tests", () => {
       await login(page, user.username, user.password);
 
       const errorMsg = page.locator(errorMessage);
+
+      // Assert that the correct error message is displayed
       await expect(errorMsg).toBeVisible();
       await expect(errorMsg).toContainText(user.error);
 
-      // Verify that the user has not been redirected to the inventory page
+      // Assert that the user has not been redirected to the inventory page
       await expect(page).not.toHaveURL(inventoryPage);
 
-      // Verify that red error icons appear next to username and password
+      // Assert that red error icons appear next to username and password
       const errorIcons = page.locator(errorIcon);
       await expect(errorIcons).toHaveCount(2);
       await expect(errorIcons.nth(0)).toBeVisible();
