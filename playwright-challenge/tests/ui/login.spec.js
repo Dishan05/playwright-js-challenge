@@ -2,8 +2,8 @@ const { test, expect } = require("@playwright/test");
 const { login } = require("../../utils/loginHelper.js");
 const testData = require("../../data/testData.json");
 
-const loginPage = "/";
-const inventoryPage = "/inventory.html";
+const LOGIN_PAGE = "/";
+const INVENTORY_PAGE = "/inventory.html";
 
 const SELECTORS = {
   errorMessage: '[data-test="error"]',
@@ -15,24 +15,24 @@ const SELECTORS = {
 
 test.describe("Functional Login Tests", () => {
   test("Given standard user credentials, when user logs in, user is redirected to inventory page", async ({ page }) => {
-    await page.goto(loginPage);
+    await page.goto(LOGIN_PAGE);
     await login(page, testData.validUsers.standard_user.username, testData.validUsers.standard_user.password);
     
     // Assert that the user is redirected to the inventory page
-    await expect(page).toHaveURL(inventoryPage);
+    await expect(page).toHaveURL(INVENTORY_PAGE);
   });
 
   test("Given locked user credentials, after logging in, user sees and can dismiss error message", async ({
     page,
   }) => {
-    await page.goto(loginPage);
+    await page.goto(LOGIN_PAGE);
     await login(page, testData.lockedUsers.locked_out_user.username, testData.lockedUsers.locked_out_user.password);
 
     // Assert that the error message is correctly displayed, and the user is not redirected to the inventory page
     const error = page.locator(SELECTORS.errorMessage);
     await expect(page.locator(SELECTORS.errorMessage)).toContainText(testData.lockedUsers.locked_out_user.error);
     await expect(error).toBeVisible();
-    await expect(page).not.toHaveURL(inventoryPage);
+    await expect(page).not.toHaveURL(INVENTORY_PAGE);
 
     // Assert that the error button is clickable, and dismissed the error
     await page.click(SELECTORS.errorButton);
@@ -43,7 +43,7 @@ test.describe("Functional Login Tests", () => {
     test(`Given invalid users, when login is clicked, login should be unsuccessful, and should show error message and icons for invalid credentials: ${key}`, async ({
       page,
     }) => {
-      await page.goto(loginPage);
+      await page.goto(LOGIN_PAGE);
 
       await login(page, user.username, user.password);
 
@@ -54,7 +54,7 @@ test.describe("Functional Login Tests", () => {
       await expect(errorMsg).toContainText(user.error);
 
       // Assert that the user has not been redirected to the inventory page
-      await expect(page).not.toHaveURL(inventoryPage);
+      await expect(page).not.toHaveURL(INVENTORY_PAGE);
 
       // Assert that red error icons appear next to username and password
       const errorIcons = page.locator(SELECTORS.errorIcon);
@@ -78,20 +78,20 @@ test.describe("Functional Login Tests", () => {
 
 test.describe("Edge Case Login Form Tests", () => {
   test('Given credentials with leading/trailing whitespace, when logging in, then the login should be unsuccessful', async ({ page }) => {
-  await page.goto(loginPage);
+  await page.goto(LOGIN_PAGE);
   await login(page, ` ${testData.validUsers.standard_user.username} `, ` ${testData.validUsers.standard_user.password} `);
-  await expect(page).not.toHaveURL(inventoryPage);
+  await expect(page).not.toHaveURL(INVENTORY_PAGE);
 });
 
 test('Given username is in uppercase, when logging in, then the login should be unsuccessful', async ({ page }) => {
-  await page.goto(loginPage);
+  await page.goto(LOGIN_PAGE);
   await login(page, testData.validUsers.standard_user.username.toUpperCase(), testData.validUsers.standard_user.password);
   await expect(page.locator(SELECTORS.errorMessage)).toBeVisible();
-  await expect(page).not.toHaveURL(inventoryPage);
+  await expect(page).not.toHaveURL(INVENTORY_PAGE);
 });
 
 test('Given multiple failed logins, when login is clicked, then consistent errors should be shown.', async ({ page }) => {
-  await page.goto(loginPage);
+  await page.goto(LOGIN_PAGE);
   for (let i = 0; i < 10; i++) {
     await login(page, testData.invalidUsers.wrongCredentials.username, testData.invalidUsers.wrongCredentials.username);
 
@@ -104,7 +104,7 @@ test('Given multiple failed logins, when login is clicked, then consistent error
   test("Given an extremely large username, and password, when logging in, then no overflow errors should occur", async ({ page }) => {
     const longText = "a".repeat(1000);
 
-    await page.goto(loginPage);
+    await page.goto(LOGIN_PAGE);
     await login(page, longText, longText);
 
     const error = page.locator(SELECTORS.errorMessage);
@@ -113,7 +113,7 @@ test('Given multiple failed logins, when login is clicked, then consistent error
   });
 
   test('Given accessibility considerations, the login page should allow login via keyboard-only navigation', async ({ page }) => {
-  await page.goto(loginPage);
+  await page.goto(LOGIN_PAGE);
 
   await page.locator(SELECTORS.usernameInput).focus();
   await page.keyboard.type(testData.validUsers.standard_user.username);
@@ -123,14 +123,14 @@ test('Given multiple failed logins, when login is clicked, then consistent error
 
   await page.keyboard.press('Enter');
 
-  await expect(page).toHaveURL(inventoryPage);
+  await expect(page).toHaveURL(INVENTORY_PAGE);
 });
 
   test('Given security considerations, the login page should not be vulnerable to SQL injection', async ({ page }) => {
-  await page.goto(loginPage);
+  await page.goto(LOGIN_PAGE);
   await login(page, "' OR '1'='1", 'password');
 
   await expect(page.locator(SELECTORS.errorMessage)).toBeVisible();
-  await expect(page).not.toHaveURL(inventoryPage);
+  await expect(page).not.toHaveURL(INVENTORY_PAGE);
 });
 });

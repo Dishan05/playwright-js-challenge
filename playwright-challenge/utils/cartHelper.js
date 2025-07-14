@@ -8,6 +8,7 @@ const SELECTORS = {
   inventoryItems: ".inventory_item",
   addToCartBtn: 'button:has-text("Add to cart")',
   checkoutBtn: '[data-test="checkout"]',
+  continueShoppingButton: '[data-test="continue-shopping"]',
 };
 
 const CART_PAGE = "/cart.html";
@@ -39,6 +40,15 @@ async function addFirstItemToCart(page) {
   await firstItem.locator(SELECTORS.addToCartBtn).click();
 }
 
+async function addItemToCart(page, itemIndex) {
+  // Ensure you're on the inventory page
+  await expect(page).toHaveURL(SELECTORS.inventoryPage);
+
+  // Add item to cart
+  const item = page.locator(SELECTORS.inventoryItems).nth(itemIndex);
+  await item.locator(SELECTORS.addToCartBtn).click();
+}
+
 async function goToCart(page) {
   // Click on the cart link, and ensure that you're redrected to the cart page
   await page.click(SELECTORS.cartLink);
@@ -51,9 +61,17 @@ async function proceedToCheckout(page) {
   await expect(page).toHaveURL(CHECKOUT_STEP_ONE);
 }
 
+async function continueShopping(page) {
+  // Click on the continue shopping button, and ensure that you're redirected to the inventory page
+  await page.click(SELECTORS.continueShoppingButton);
+  await expect(page).toHaveURL(SELECTORS.inventoryPage);
+}
+
 module.exports = {
   clearCart,
   addFirstItemToCart,
+  addItemToCart,
   goToCart,
+  continueShopping,
   proceedToCheckout
 };

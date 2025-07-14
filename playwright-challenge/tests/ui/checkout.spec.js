@@ -28,6 +28,7 @@ const SELECTORS = {
   backHomeButton: "[data-test='back-to-products']",
 };
 
+const LOGIN_PAGE = "/";
 const INVENTORY_PAGE = "/inventory.html";
 const CART_PAGE = "/cart.html";
 const CHECKOUT_STEP_ONE = "/checkout-step-one.html";
@@ -53,7 +54,7 @@ for (const userType of [
   test.describe(`${userType}: functional checkout tests`, () => {
     test.beforeEach(async ({ page }) => {
       const user = testData.validUsers[userType];
-      await page.goto("/");
+      await page.goto(LOGIN_PAGE);
       await login(page, user.username, user.password);
       await expect(page).toHaveURL(INVENTORY_PAGE);
 

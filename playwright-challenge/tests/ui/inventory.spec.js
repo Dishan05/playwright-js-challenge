@@ -5,7 +5,7 @@ const { clearCart } = require("../../utils/cartHelper.js");
 
 const loginPage = "/";
 
-const selectors = {
+const SELECTORS = {
   inventoryItems: ".inventory_item",
   itemImage: ".inventory_item_img img",
   itemName: ".inventory_item_name",
@@ -35,32 +35,32 @@ for (const userType of [
     test(`(${userType}) loads all 6 inventory items with visible core elements`, async ({
       page,
     }) => {
-      const items = page.locator(selectors.inventoryItems);
+      const items = page.locator(SELECTORS.inventoryItems);
       await expect(items).toHaveCount(6);
 
       for (let i = 0; i < (await items.count()); i++) {
         const item = items.nth(i);
-        const image = item.locator(selectors.itemImage);
+        const image = item.locator(SELECTORS.itemImage);
 
         await expect(image).toBeVisible();
 
         const src = await image.getAttribute("src");
         expect(src).not.toContain("sl-404");
 
-        await expect(item.locator(selectors.itemName)).toBeVisible();
-        await expect(item.locator(selectors.itemPrice)).toBeVisible();
-        await expect(item.locator(selectors.addToCartBtn)).toBeVisible();
+        await expect(item.locator(SELECTORS.itemName)).toBeVisible();
+        await expect(item.locator(SELECTORS.itemPrice)).toBeVisible();
+        await expect(item.locator(SELECTORS.addToCartBtn)).toBeVisible();
       }
     });
 
     test(`(${userType}) add all items to cart and verify badge updates, then remove all`, async ({
       page,
     }) => {
-      const addButtons = page.locator(selectors.addToCartBtn);
+      const addButtons = page.locator(SELECTORS.addToCartBtn);
       for (let i = 0; i < 6; i++) {
         await addButtons.nth(i).click();
       }
-      const badge = page.locator(selectors.cartBadge);
+      const badge = page.locator(SELECTORS.cartBadge);
       await expect(badge).toHaveText("6");
 
       for (let i = 0; i < 6; i++) {
@@ -72,12 +72,12 @@ for (const userType of [
     test("each product navigates to detail page with matching name", async ({
       page,
     }) => {
-      const items = page.locator(selectors.inventoryItems);
+      const items = page.locator(SELECTORS.inventoryItems);
       const count = await items.count();
 
       for (let i = 0; i < count; i++) {
         const item = items.nth(i);
-        const nameLocator = item.locator(selectors.itemName);
+        const nameLocator = item.locator(SELECTORS.itemName);
         const name = (await nameLocator.textContent()).trim();
 
         const linkLocator = await item.locator("a").first();
@@ -94,34 +94,34 @@ for (const userType of [
         expect(detailName).toBe(name);
 
         await page.goBack();
-        await expect(page.locator(selectors.inventoryItems)).toHaveCount(count);
+        await expect(page.locator(SELECTORS.inventoryItems)).toHaveCount(count);
       }
     });
 
     test("sort dropdown functions correctly", async ({ page }) => {
       const getItemNames = async () =>
-        (await page.locator(selectors.itemName).allTextContents()).map((name) =>
+        (await page.locator(SELECTORS.itemName).allTextContents()).map((name) =>
           name.trim()
         );
 
       const getItemPrices = async () =>
-        (await page.locator(selectors.itemPrice).allTextContents()).map(
+        (await page.locator(SELECTORS.itemPrice).allTextContents()).map(
           (price) => parseFloat(price.replace("$", ""))
         );
 
-      await page.selectOption(selectors.sortDropdown, "az");
+      await page.selectOption(SELECTORS.sortDropdown, "az");
       let names = await getItemNames();
       expect(names).toEqual([...names].sort());
 
-      await page.selectOption(selectors.sortDropdown, "za");
+      await page.selectOption(SELECTORS.sortDropdown, "za");
       names = await getItemNames();
       expect(names).toEqual([...names].sort().reverse());
 
-      await page.selectOption(selectors.sortDropdown, "lohi");
+      await page.selectOption(SELECTORS.sortDropdown, "lohi");
       let prices = await getItemPrices();
       expect(prices).toEqual([...prices].sort((a, b) => a - b));
 
-      await page.selectOption(selectors.sortDropdown, "hilo");
+      await page.selectOption(SELECTORS.sortDropdown, "hilo");
       prices = await getItemPrices();
       expect(prices).toEqual([...prices].sort((a, b) => b - a));
     });
@@ -147,7 +147,7 @@ for (const userType of [
       const start = Date.now();
       await page.goto(INVENTORY_PAGE);
       await page
-        .locator(selectors.inventoryItems)
+        .locator(SELECTORS.inventoryItems)
         .first()
         .waitFor({ timeout: 10000 });
       const duration = Date.now() - start;

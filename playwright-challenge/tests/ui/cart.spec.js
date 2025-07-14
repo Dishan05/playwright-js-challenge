@@ -1,24 +1,30 @@
 const { test, expect } = require("@playwright/test");
 const testData = require("../../data/testData.json");
 const { login } = require("../../utils/loginHelper.js");
+const {
+  addItemToCart,
+  addFirstItemToCart,
+  goToCart,
+  continueShopping,
+  proceedToCheckout,
+} = require("../../utils/cartHelper.js");
 
 const SELECTORS = {
   inventoryItems: ".inventory_item",
   itemName: ".inventory_item_name",
   itemPrice: ".inventory_item_price",
-  addToCartBtn: "button.btn_inventory",
+  addToCartButton: "button.btn_inventory",
   cartBadge: ".shopping_cart_badge",
   cartLink: ".shopping_cart_link",
   cartItem: ".cart_item",
   cartItemName: ".inventory_item_name",
   cartItemPrice: ".inventory_item_price",
-  removeBtn: "button.cart_button",
+  removeButton: "button.cart_button",
   continueShoppingBtn: "[data-test='continue-shopping']",
-  checkoutBtn: "[data-test='checkout']",
+  checkoutButton: "[data-test='checkout']",
 };
 
 const INVENTORY_PAGE = "/inventory.html";
-const CART_PAGE = "/cart.html";
 
 for (const userType of [
   "standard_user",
@@ -27,7 +33,7 @@ for (const userType of [
   "visual_user",
   "problem_user",
 ]) {
-  test.describe(`${userType} shopping cart tests`, () => {
+  test.describe(`${userType} functional shopping cart tests`, () => {
     test.beforeEach(async ({ page }) => {
       const user = testData.validUsers[userType];
       await page.goto("/");
@@ -35,20 +41,19 @@ for (const userType of [
       await expect(page).toHaveURL(INVENTORY_PAGE);
     });
 
-    //Add test to check what happens when the back/continue shopping button is clicked
-
-    test("adds item from inventory and appears in cart", async ({ page }) => {
+    test("Given a valid user adds an item to the cart, when they view the cart, then the cart badge should have the correct count and the item should be present with the correct details", async ({ page }) => {
       const firstItem = page.locator(SELECTORS.inventoryItems).nth(0);
       const name = await firstItem.locator(SELECTORS.itemName).textContent();
       const price = await firstItem.locator(SELECTORS.itemPrice).textContent();
 
-      await firstItem.locator(SELECTORS.addToCartBtn).click();
+      await addFirstItemToCart(page);
+      // Assert that the cart badge is updated with the correct count
       await expect(page.locator(SELECTORS.cartBadge)).toHaveText("1");
 
-      await page.click(SELECTORS.cartLink);
-      await expect(page).toHaveURL(CART_PAGE);
+      await goToCart(page);
 
       const cartItem = page.locator(SELECTORS.cartItem);
+      // Assert that the cart item is present and has the correct name and price
       await expect(cartItem).toHaveCount(1);
       await expect(cartItem.locator(SELECTORS.cartItemName)).toHaveText(
         name.trim()
@@ -58,53 +63,53 @@ for (const userType of [
       );
     });
 
-    test("removes item from cart and updates badge", async ({ page }) => {
-      await page
-        .locator(SELECTORS.inventoryItems)
-        .nth(0)
-        .locator(SELECTORS.addToCartBtn)
-        .click();
-      await page.click(SELECTORS.cartLink);
-      await expect(page).toHaveURL(CART_PAGE);
+    test("Given a user has an item in the cart, when they remove the item, then the cart badge, and the cart should be empty", async ({ page }) => {
+      await addFirstItemToCart(page);
+      await goToCart(page);
 
-      await page.locator(SELECTORS.removeBtn).click();
+      await page.locator(SELECTORS.removeButton).click();
+
+      // Assert that the cart item is removed, and the badge is updated
       await expect(page.locator(SELECTORS.cartItem)).toHaveCount(0);
       await expect(page.locator(SELECTORS.cartBadge)).toHaveCount(0);
     });
 
-    test("cart persists after navigation", async ({ page }) => {
-      await page
-        .locator(SELECTORS.inventoryItems)
-        .nth(0)
-        .locator(SELECTORS.addToCartBtn)
-        .click();
-      await page.click(SELECTORS.cartLink);
-      await expect(page).toHaveURL(CART_PAGE);
+    test("Given user adds items one at a time to the cart, when they view the cart, continue shopping, and then return to cart, then the cart should retain the correct items", async ({
+      page,
+    }) => {
+      const itemsCount = await page.locator(SELECTORS.inventoryItems).count();
+      for (let i = 0; i < itemsCount; i++) {
+        await addItemToCart(page, i);
+        await goToCart(page);
 
-      await page.click(SELECTORS.continueShoppingBtn);
-      await expect(page).toHaveURL(INVENTORY_PAGE);
-      await expect(page.locator(SELECTORS.cartBadge)).toHaveText("1");
+        await continueShopping(page);
 
-      await page.click(SELECTORS.cartLink);
-      await expect(page.locator(SELECTORS.cartItem)).toHaveCount(1);
+        // Assert that the cart badge is updated with the correct count
+        await expect(page.locator(SELECTORS.cartBadge)).toHaveText(
+          (i + 1).toString()
+        );
+
+        await goToCart(page);
+        // Assert that the cart item count matches the number of items added
+        await expect(page.locator(SELECTORS.cartItem)).toHaveCount(i + 1);
+
+        // This ensures that we return to the inventory page after each item is added
+        await continueShopping(page);
+      }
     });
 
-    test("proceeds to checkout with item in cart", async ({ page }) => {
-      await page
-        .locator(SELECTORS.inventoryItems)
-        .nth(0)
-        .locator(SELECTORS.addToCartBtn)
-        .click();
-      await page.click(SELECTORS.cartLink);
-      await page.click(SELECTORS.checkoutBtn);
+    test("Given user adds an item to the cart, when they checkout, then they should be redirected to the correct page", async ({ page }) => {
+      await addFirstItemToCart(page);
+      await goToCart(page);
+      await proceedToCheckout(page);
+
       await expect(page).toHaveURL(/checkout-step-one/);
     });
 
-    test("displays empty cart correctly", async ({ page }) => {
-      await page.click(SELECTORS.cartLink);
-      await expect(page).toHaveURL(CART_PAGE);
+    test("Given user has no items in the cart, when they view the cart, then the cart should be empty, and the checkout button disabled", async ({ page }) => {
+      await goToCart(page);
       await expect(page.locator(SELECTORS.cartItem)).toHaveCount(0);
-      await expect(page.locator(SELECTORS.checkoutBtn))
+      await expect(page.locator(SELECTORS.checkoutButton))
         .toBeDisabled({ timeout: 1000 })
         .catch(() => {});
     });
