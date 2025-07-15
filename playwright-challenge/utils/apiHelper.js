@@ -1,5 +1,6 @@
 const {request, default: test} = require('@playwright/test');
-const testData = require('../data/testData_api.json');
+const path = require('path');
+const testData = require(path.resolve(__dirname, '../../data/testData_api.json'));
 
 const BASE_URL = testData.config.baseUrl;
 const AUTH_ENDPOINT = '/auth';

@@ -1,5 +1,7 @@
 const {test, expect} = require('@playwright/test');
-const testData = require('../../data/testData_api.json');
+const path = require('path');
+const testData = require(path.resolve(__dirname, '../../data/testData_api.json'));
+
 const {getAuthorizedApiContext, getUnauthorizedApiContext, createNewBooking, getBookings, getBookingById, updateAllBookingDetails, UpdatePartialBookingDetails, deleteBooking, getBookingByQuery} = require('../../utils/apiHelper.js');
 
 test.describe('Booking API functional tests', () => {
