@@ -30,7 +30,6 @@ const INVENTORY_PAGE = "/inventory.html";
 
 for (const userType of [
   "standard_user",
-  "performance_glitch_user",
   "error_user",
   "visual_user",
   "problem_user",

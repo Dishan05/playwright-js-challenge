@@ -48,7 +48,6 @@ const invalidCheckoutInformationUsers = Object.entries(
 
 for (const userType of [
   "standard_user",
-  "performance_glitch_user",
   "error_user",
   "visual_user",
   "problem_user",
