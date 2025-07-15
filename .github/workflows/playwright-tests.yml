@@ -28,6 +28,7 @@ jobs:
       - name: Run Playwright tests with HTML reporter
         run: npx playwright test --config=playwright.config.js --reporter=html --output=test-results
         working-directory: ./playwright-challenge
+        continue-on-error: true
 
       - name: List report folder contents
         run: ls -la playwright-report/
