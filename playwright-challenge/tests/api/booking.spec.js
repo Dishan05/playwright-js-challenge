@@ -1,6 +1,6 @@
 const {test, expect} = require('@playwright/test');
 const path = require('path');
-const testData = require(path.resolve(__dirname, '../../data/testData_api.json'));
+const testData = require(path.resolve(__dirname, '../../data/testdata_api.json'));
 
 const {getAuthorizedApiContext, getUnauthorizedApiContext, createNewBooking, getBookings, getBookingById, updateAllBookingDetails, UpdatePartialBookingDetails, deleteBooking, getBookingByQuery} = require('../../utils/apiHelper.js');
 
