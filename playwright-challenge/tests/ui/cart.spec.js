@@ -9,6 +9,7 @@ const {
   proceedToCheckout,
 } = require("../../utils/cartHelper.js");
 
+//TODO: Move these out to a page object model
 const SELECTORS = {
   inventoryItems: ".inventory_item",
   itemName: ".inventory_item_name",

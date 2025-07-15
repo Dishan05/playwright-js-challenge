@@ -5,6 +5,7 @@ const testData = require("../../data/testData.json");
 const LOGIN_PAGE = "/";
 const INVENTORY_PAGE = "/inventory.html";
 
+// TODO: Move these out to a page object model
 const SELECTORS = {
   errorMessage: '[data-test="error"]',
   errorButton: ".error-button",

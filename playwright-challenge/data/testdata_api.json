@@ -1,0 +1,141 @@
+{
+  "bookingData": {
+    "newBooking": {
+      "firstname": "John",
+      "lastname": "Doe",
+      "totalprice": 150,
+      "depositpaid": true,
+      "bookingdates": {
+        "checkin": "2023-10-01",
+        "checkout": "2023-10-10"
+      },
+      "additionalneeds": "Breakfast"
+    },
+    "updatedBooking": {
+      "firstname": "JohnUpdated",
+      "lastname": "Doe",
+      "totalprice": 200,
+      "depositpaid": false,
+      "bookingdates": {
+        "checkin": "2023-10-05",
+        "checkout": "2023-10-15"
+      },
+      "additionalneeds": "Lunch"
+    },
+    "partialUpdate": {
+      "additionalneeds": "Dinner"
+    },
+    "queryParameters": {
+      "firstname": "Auto",
+      "lastname": "Tester",
+      "totalprice": 9666,
+      "depositpaid": true,
+      "bookingdates": {
+        "checkin": "2025-07-15",
+        "checkout": "2025-07-20"
+      },
+      "additionalneeds": "Breakfast"
+    }
+  },
+  "invalidBooking": {
+    "missingFirstName": {
+      "firstname": "",
+      "lastname": "Doe",
+      "totalprice": 150,
+      "depositpaid": true,
+      "bookingdates": {
+        "checkin": "2023-10-01",
+        "checkout": "2023-10-10"
+      },
+      "expectedError": "Error: First Name is required"
+    },
+    "missingLastName": {
+      "firstname": "John",
+      "lastname": "",
+      "totalprice": 150,
+      "depositpaid": true,
+      "bookingdates": {
+        "checkin": "2023-10-01",
+        "checkout": "2023-10-10"
+      },
+      "expectedError": "Error: Last Name is required"
+    },
+    "missingTotalPrice": {
+      "firstname": "John",
+      "lastname": "Doe",
+      "totalprice": null,
+      "depositpaid": true,
+      "bookingdates": {
+        "checkin": "2023-10-01",
+        "checkout": "2023-10-10"
+      },
+      "expectedError": "Error: Total Price is required"
+    },
+    "missingDepositPaid": {
+      "firstname": "John",
+      "lastname": "Doe",
+      "totalprice": 150,
+      "depositpaid": null,
+      "bookingdates": {
+        "checkin": "2023-10-01",
+        "checkout": "2023-10-10"
+      },
+      "expectedError": "Error: Deposit Paid is required"
+    },
+    "stringTotalPrice": {
+      "firstname": "John",
+      "lastname": "Doe",
+      "totalprice": "one hundred",
+      "depositpaid": true,
+      "bookingdates": {
+        "checkin": "2023-10-01",
+        "checkout": "2023-10-10"
+      },
+      "expectedError": "Error: Total Price must be a number"
+    },
+    "invalidCheckinDate": {
+      "firstname": "John",
+      "lastname": "Doe",
+      "totalprice": 150,
+      "depositpaid": true,
+      "bookingdates": {
+        "checkin": "invalid-date",
+        "checkout": "2023-10-10"
+      },
+      "expectedError": "Error: Check-in date is invalid"
+    },
+    "invalidCheckoutDate": {
+      "firstname": "John",
+      "lastname": "Doe",
+      "totalprice": 150,
+      "depositpaid": true,
+      "bookingdates": {
+        "checkin": "2023-10-01",
+        "checkout": "invalid-date"
+      },
+      "expectedError": "Error: Check-out date is invalid"
+    }
+  },
+  "queryParameterPermutations": {
+    "firstname_only": { "firstname": "Auto" },
+    "lastname_only": { "lastname": "Tester" },
+    "firstname_and_lastname": { "firstname": "Auto", "lastname": "Tester" },
+    "checkin_only": { "checkin": "2025-07-15" },
+    "checkout_only": { "checkout": "2025-07-20" },
+    "firstname_and_checkin": { "firstname": "Auto", "checkin": "2025-07-15" },
+    "lastname_and_checkout": { "lastname": "Tester", "checkout": "2025-07-20" },
+    "all_combined": {
+      "firstname": "Auto",
+      "lastname": "Tester",
+      "checkin": "2025-07-15",
+      "checkout": "2025-07-20"
+    }
+  },
+  "config": {
+    "baseUrl": "https://restful-booker.herokuapp.com",
+    "auth": {
+      "username": "admin",
+      "password": "password123"
+    }
+  }
+}

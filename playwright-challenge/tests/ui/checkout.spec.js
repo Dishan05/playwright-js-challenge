@@ -11,6 +11,7 @@ const {
   populateCheckoutInformationAndContinue,
 } = require("../../utils/checkoutHelper.js");
 
+// TODO: Move these out to a page object model
 const SELECTORS = {
   inventoryItems: ".inventory_item",
   addToCartButton: "button.btn_inventory",
