@@ -26,7 +26,7 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: Run Playwright tests with HTML reporter
-        run: npx playwright test --config=playwright.config.js --reporter=html --output=test-results
+        run: npx playwright test --config=./playwright.config.js --reporter=html --output=test-results
 
       - name: List report folder contents
         run: ls -la playwright-report/
