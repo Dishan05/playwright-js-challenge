@@ -1,7 +1,7 @@
 const { test, expect } = require("@playwright/test");
 const { login } = require("../../utils/loginHelper.js");
 const path = require('path');
-const testData = require(path.resolve(__dirname, '../../data/testData.json'));
+const testData = require(path.resolve(__dirname, '../../data/testdata.json'));
 
 const LOGIN_PAGE = "/";
 const INVENTORY_PAGE = "/inventory.html";

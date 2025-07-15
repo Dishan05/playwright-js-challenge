@@ -1,6 +1,6 @@
 const { test, expect } = require("@playwright/test");
 const path = require('path');
-const testData = require(path.resolve(__dirname, '../../data/testData.json'));
+const testData = require(path.resolve(__dirname, '../../data/testdata.json'));
 const { login } = require("../../utils/loginHelper.js");
 const {
   addItemToCart,
