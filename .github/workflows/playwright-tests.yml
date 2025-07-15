@@ -10,6 +10,10 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: playwright-js-challenge
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -35,22 +39,22 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report
-          path: playwright-report/
+          path: playwright-js-challenge/playwright-report/
 
       - name: Upload screenshots (if any)
         uses: actions/upload-artifact@v4
         with:
           name: screenshots
-          path: test-results/screenshots/
+          path: playwright-js-challenge/test-results/screenshots/
 
       - name: Upload videos (if any)
         uses: actions/upload-artifact@v4
         with:
           name: videos
-          path: test-results/videos/
+          path: playwright-js-challenge/test-results/videos/
 
       - name: Upload test results JSON (for analysis)
         uses: actions/upload-artifact@v4
         with:
           name: test-results-json
-          path: test-results/
+          path: playwright-js-challenge/test-results/
