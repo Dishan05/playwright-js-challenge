@@ -42,6 +42,16 @@
       "username": "wrong_user",
       "password": "wrong_password",
       "error": "Epic sadface: Username and password do not match any user in this service"
+    },
+    "whitespaceUsername": {
+      "username": "standard _ user",
+      "password": "secret_sauce",
+      "error": "Epic sadface: Username is required"
+    },
+    "specialCharsUserName": {
+      "username": "standard$_%user",
+      "password": "secret_sauce",
+      "error": "Epic sadface: Username is required"
     }
   },
   "checkoutInformation": {
