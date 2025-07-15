@@ -1,6 +1,7 @@
-const {request} = require('@playwright/test');
+const {request, default: test} = require('@playwright/test');
+const testData = require('../data/testData_api.json');
 
-const BASE_URL = 'https://restful-booker.herokuapp.com';
+const BASE_URL = testData.config.baseUrl;
 const AUTH_ENDPOINT = '/auth';
 const DEFAULT_HEADERS = {
   'Content-Type': 'application/json',
@@ -16,8 +17,8 @@ async function getAuthorizedApiContext()
 
     const authResponse = await apiContext.post(AUTH_ENDPOINT, {
         data: {
-            username: 'admin',
-            password: 'password123',
+            username: testData.config.auth.username,
+            password: testData.config.auth.password,
         },
     });
 
